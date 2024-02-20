@@ -12,16 +12,39 @@ class Ship(pygame.sprite.Sprite):
 		# 3. We need a rect
 		self.rect = self.image.get_rect(center = (WINDOW_WIDTH /2, WINDOW_HEIGHT / 2))
 
+		# timer
+		self.can_shoot = True
+		self.shoot_time = None
+
+	def laser_timer(self):
+		if not self.can_shoot:
+			current_time = pygame.time.get_ticks()
+			if current_time - self.shoot_time > 500:
+				self.can_shoot = True
+
+	def input_position(self):
+		pos = pygame.mouse.get_pos()
+		self.rect.center = pos
+
+	def laser_shoot(self):
+		if pygame.mouse.get_pressed()[0] and self.can_shoot:
+			print('shoot laser')
+			self.can_shoot = False
+			self.shoot_time = pygame.time.get_ticks()
+		
+		# exercise: implement the laser timer inside of the class
+
+
+	def update(self):
+		self.laser_timer()
+		self.input_position()
+		self.laser_shoot()
+
 class Laser(pygame.sprite.Sprite):
 	def __init__(self,pos,groups):
 		super().__init__(groups)
 		self.image = pygame.image.load('D:/Programming/Learn Python by making games/Asteroid Shooter/asteroid_shooter_files/project_4 - Image Text/graphics/laser.png').convert_alpha()
 		self.rect = self.image.get_rect(midbottom = pos)
-
-# exercise
-# Create a laser sprite
-# create a new class + a new group
-# when the laser object is created, you should be able to set the position via the arguments
 
 # basic setup
 pygame.init()
@@ -34,7 +57,7 @@ clock = pygame.time.Clock()
 background_surf = pygame.image.load('D:/Programming/Learn Python by making games/Asteroid Shooter/asteroid_shooter_files/project_4 - Image Text/graphics/background.png').convert()
 
 # sprite groups
-spaceship_group = pygame.sprite.Group()
+spaceship_group = pygame.sprite.GroupSingle()
 laser_group = pygame.sprite.Group()
 
 # sprite creation
@@ -55,6 +78,9 @@ while True:
 
 	# background
 	display_surface.blit(background_surf,(0,0))
+
+	# update
+	spaceship_group.update()
 
 	# graphics
 	spaceship_group.draw(display_surface)
