@@ -28,12 +28,10 @@ class Ship(pygame.sprite.Sprite):
 
 	def laser_shoot(self):
 		if pygame.mouse.get_pressed()[0] and self.can_shoot:
-			print('shoot laser')
 			self.can_shoot = False
 			self.shoot_time = pygame.time.get_ticks()
-		
-		# exercise: implement the laser timer inside of the class
 
+			Laser(self.rect.midtop,laser_group)
 
 	def update(self):
 		self.laser_timer()
@@ -45,6 +43,15 @@ class Laser(pygame.sprite.Sprite):
 		super().__init__(groups)
 		self.image = pygame.image.load('D:/Programming/Learn Python by making games/Asteroid Shooter/asteroid_shooter_files/project_4 - Image Text/graphics/laser.png').convert_alpha()
 		self.rect = self.image.get_rect(midbottom = pos)
+
+		# float based position
+		self.pos = pygame.math.Vector2(self.rect.topleft)
+		self.direction = pygame.math.Vector2(0,-1)
+		self.speed = 600
+
+	def update(self):
+		self.pos += self.direction * self.speed * dt
+		self.rect.topleft = (round(self.pos.x),round(self.pos.y))
 
 # basic setup
 pygame.init()
@@ -62,7 +69,6 @@ laser_group = pygame.sprite.Group()
 
 # sprite creation
 ship = Ship(spaceship_group)
-laser = Laser((1000,500),laser_group)
 
 # game loop
 while True:
@@ -81,6 +87,7 @@ while True:
 
 	# update
 	spaceship_group.update()
+	laser_group.update()
 
 	# graphics
 	spaceship_group.draw(display_surface)
