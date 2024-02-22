@@ -34,10 +34,17 @@ class Ship(pygame.sprite.Sprite):
 
 			Laser(self.rect.midtop,laser_group)
 
+	def meteor_collision(self):
+		if pygame.sprite.spritecollide(self,meteor_group,False):
+			pygame.quit()
+			sys.exit()
+
 	def update(self):
 		self.laser_timer()
 		self.input_position()
 		self.laser_shoot()
+
+		self.meteor_collision()
 
 class Laser(pygame.sprite.Sprite):
 	def __init__(self,pos,groups):
@@ -50,9 +57,18 @@ class Laser(pygame.sprite.Sprite):
 		self.direction = pygame.math.Vector2(0,-1)
 		self.speed = 600
 
+	def meteor_collision(self):
+		if pygame.sprite.spritecollide(self,meteor_group,True):
+			self.kill()
+
 	def update(self):
 		self.pos += self.direction * self.speed * dt
 		self.rect.topleft = (round(self.pos.x),round(self.pos.y))
+
+		if self.rect.bottom < 0:
+			self.kill()
+
+		self.meteor_collision()
 
 class Meteor(pygame.sprite.Sprite):
 	def __init__(self,pos,groups):
@@ -84,6 +100,9 @@ class Meteor(pygame.sprite.Sprite):
 		self.pos += self.direction * self.speed * dt 
 		self.rect.topleft = (round(self.pos.x),round(self.pos.y))
 		self.rotate()
+
+		if self.top < WINDOW_HEIGHT:
+			self.kill()
 
 class Score: 
 	def __init__(self):
