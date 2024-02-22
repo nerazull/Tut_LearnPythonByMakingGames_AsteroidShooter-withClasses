@@ -1,6 +1,8 @@
 import pygame, sys
 from random import randint, uniform
 
+# add the sound: laser, explosion, bg music
+
 class Ship(pygame.sprite.Sprite):
 	def __init__(self,groups):
 
@@ -20,6 +22,9 @@ class Ship(pygame.sprite.Sprite):
 		self.can_shoot = True
 		self.shoot_time = None
 
+		# sound
+		self.laser_sound = pygame.mixer.Sound('D:/Programming/Learn Python by making games/Asteroid Shooter/asteroid_shooter_files/project_4 - Image Text\sounds\laser.ogg')
+
 	def laser_timer(self):
 		if not self.can_shoot:
 			current_time = pygame.time.get_ticks()
@@ -34,8 +39,8 @@ class Ship(pygame.sprite.Sprite):
 		if pygame.mouse.get_pressed()[0] and self.can_shoot:
 			self.can_shoot = False
 			self.shoot_time = pygame.time.get_ticks()
-
 			Laser(self.rect.midtop,laser_group)
+			self.laser_sound.play()
 
 	def meteor_collision(self):
 		if pygame.sprite.spritecollide(self,meteor_group,False,pygame.sprite.collide_mask):
@@ -46,7 +51,6 @@ class Ship(pygame.sprite.Sprite):
 		self.laser_timer()
 		self.input_position()
 		self.laser_shoot()
-
 		self.meteor_collision()
 
 class Laser(pygame.sprite.Sprite):
@@ -54,16 +58,20 @@ class Laser(pygame.sprite.Sprite):
 		super().__init__(groups)
 		self.image = pygame.image.load('D:/Programming/Learn Python by making games/Asteroid Shooter/asteroid_shooter_files/project_4 - Image Text/graphics/laser.png').convert_alpha()
 		self.rect = self.image.get_rect(midbottom = pos)
-		self.mask = pygame.mask.from_surface(self.image)
-
+		self.mask = pygame.mask.from_surface(self.image)	
+		
 		# float based position
 		self.pos = pygame.math.Vector2(self.rect.topleft)
 		self.direction = pygame.math.Vector2(0,-1)
 		self.speed = 600
 
+		# sound
+		self.explosion_sound = pygame.mixer.Sound('D:/Programming/Learn Python by making games/Asteroid Shooter/asteroid_shooter_files/project_4 - Image Text\sounds\explosion.wav')
+
 	def meteor_collision(self):
 		if pygame.sprite.spritecollide(self,meteor_group,True,pygame.sprite.collide_mask):
 			self.kill()
+			self.explosion_sound.play()
 
 	def update(self):
 		self.pos += self.direction * self.speed * dt
@@ -151,6 +159,10 @@ pygame.time.set_timer(meteor_timer,400)
 
 # score
 score = Score()
+
+# music
+bg_music = pygame.mixer.Sound('D:/Programming/Learn Python by making games/Asteroid Shooter/asteroid_shooter_files/project_4 - Image Text\sounds\music.wav')
+bg_music.play(loops = -1)
 
 # game loop
 while True:
